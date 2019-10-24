@@ -4,10 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/tiagorlampert/CHAOS/src/util"
 	"github.com/tidwall/gjson"
 	"io"
 	"io/ioutil"
+	"kunpeng/fileutil"
 	"net/http"
 	"strings"
 	"time"
@@ -75,7 +75,6 @@ func HttpPost(url string, data string, contentType string) string {
 	return string(body)
 }
 
-
 func main() {
 	//url := "http://127.0.0.1:8080"
 	//print(Get(url))
@@ -86,13 +85,13 @@ func main() {
 	print(jsonString)
 	value := gjson.Get(jsonString, "FileName")
 	println(value.String())
-	temppath := util.GetCurrentDirectory()
-	if util.CheckIfFileExist(temppath + "/windows2012.txt") {
+	temppath := fileutil.GetCurrentDirectory()
+	if fileutil.CheckIfFileExist(temppath + "/windows2012.txt") {
 		print(temppath + "/windows2012.txt:" + "file exist")
 	} else {
-		util.CreateFile(temppath + "/windows2012.txt")
-		util.AppendToFile(temppath+"/windows2012.txt", "["+jsonString+"]")
+		fileutil.CreateFile(temppath + "/windows2012.txt")
+		fileutil.AppendToFile(temppath+"/windows2012.txt", "["+jsonString+"]")
 	}
-	util.AppendToFileFromSubOne(temppath+"/windows2012.txt", ","+jsonString+"]")
+	fileutil.AppendToFileFromSubOne(temppath+"/windows2012.txt", ","+jsonString+"]")
 
 }

