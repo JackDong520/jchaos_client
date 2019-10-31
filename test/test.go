@@ -2,8 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"kunpeng/config"
-	"kunpeng/hackpackage"
+	"fmt"
 	"kunpeng/keylogger"
 	"kunpeng/service"
 	"time"
@@ -22,8 +21,8 @@ import (
 //	fmt.Scanln(&input)
 //}
 type SocketInfo struct {
-	ResultCode int
-	ResultMsg  string
+	ResultCode int32  `json:"ResultCode"`
+	ResultMsg  string `json:"ResultMsg"`
 }
 
 func main() {
@@ -58,11 +57,15 @@ func TestNmap() {
 
 }
 func testJson() {
-	msg := SocketInfo{config.Result_Code_ReturnOsInfo, hackpackage.GetOSInformation()}
-	print(msg.ResultMsg)
-	print(msg.ResultCode)
-	jsonstring, err := json.Marshal(&msg)
-	print(err)
-	print(string(jsonstring))
+	jsonStr := `
+		{
+			"ResultCode":104,
+			"ResultMsg":"wdnmd"
+		}
+	`
 
+	socketinfo := SocketInfo{}
+	json.Unmarshal([]byte(jsonStr), &socketinfo)
+	fmt.Println(socketinfo.ResultCode)
+	fmt.Println(socketinfo.ResultMsg)
 }

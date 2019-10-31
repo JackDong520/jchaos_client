@@ -17,6 +17,7 @@
         <method importPath="os" receiver="*File" name="close" />
         <method importPath="net" receiver="Conn" name="Write" />
         <method importPath="net" receiver="Conn" name="Close" />
+        <method importPath="bufio" receiver="*Writer" name="Write" />
       </methods>
     </inspection_tool>
   </profile>

