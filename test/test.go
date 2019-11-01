@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"kunpeng/keylogger"
+	"kunpeng/nmap"
 	"kunpeng/service"
 	"time"
 )
@@ -26,7 +27,7 @@ type SocketInfo struct {
 }
 
 func main() {
-	testJson()
+	testNmap()
 }
 func TestKeyogger() {
 	if !keylogger.StartKeyLogger() {
@@ -68,4 +69,13 @@ func testJson() {
 	json.Unmarshal([]byte(jsonStr), &socketinfo)
 	fmt.Println(socketinfo.ResultCode)
 	fmt.Println(socketinfo.ResultMsg)
+}
+
+func testNmap() {
+	nmap.ExecNmap()
+
+	for k, v := range nmap.NmapInfos {
+		fmt.Printf("%s=%d;\n", k, v)
+	}
+
 }

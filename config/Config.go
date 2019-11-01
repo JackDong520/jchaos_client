@@ -14,7 +14,11 @@ const (
 	Result_Code_KeyLoggerNotOpen = 2003
 	Result_Code_ReturnKeyLogger  = 2004
 
-	Request_Code_Nmap            = 101
+	Result_Code_NmapInfoList = 3001
+
+	Request_Code_Nmap        = 101
+	Request_Code_GetNmapInfo = 1011
+
 	Request_Code_GetRunGetOs     = 102
 	Request_Code_RunRunGetOs     = 103
 	Request_Code_KeyLogger_Start = 104
